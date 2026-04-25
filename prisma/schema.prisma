@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum BookReadingState {
+  UNREAD
+  PLAN_TO_READ
+  READING
+  READ
+  DROPPED
+}
+
+model Book {
+  id           Int              @id @default(autoincrement())
+  title        String
+  author       String
+  description  String           @db.Text
+  summary      String           @db.Text
+  readingState BookReadingState @default(UNREAD)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
