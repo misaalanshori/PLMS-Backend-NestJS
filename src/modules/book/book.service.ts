@@ -7,7 +7,7 @@ import { CreateBookDto } from './dto/createBook.dto';
 export class BookService {
   constructor(private prisma: PrismaService) {}
   getBook(id: number): Promise<Book | null> {
-    const book = this.prisma.book.findFirst({ where: { id } });
+    const book = this.prisma.book.findFirstOrThrow({ where: { id } });
     return book;
   }
 
