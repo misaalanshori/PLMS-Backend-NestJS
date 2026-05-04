@@ -12,17 +12,17 @@ export class CreateBookDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(191)
-  title: string = '';
+  title: string;
 
   @IsString()
   @MaxLength(191)
-  author: string = '';
+  author: string;
 
   @IsString()
-  description: string = '';
+  description: string;
 
   @IsString()
-  summary: string = '';
+  summary: string;
 
   @IsEnum(BookReadingState)
   readingState: BookReadingState = BookReadingState.UNREAD;
