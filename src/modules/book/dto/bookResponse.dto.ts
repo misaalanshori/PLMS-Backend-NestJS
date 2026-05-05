@@ -13,10 +13,10 @@ export class BookResponseDto {
   author: string;
 
   @Expose()
-  description: string;
+  description: string | null;
 
   @Expose()
-  summary: string;
+  summary: string | null;
 
   @Expose()
   readingState: BookReadingState;

@@ -19,13 +19,16 @@ export class CreateBookDto {
   author: string;
 
   @IsString()
+  @IsOptional()
   description: string;
 
   @IsString()
+  @IsOptional()
   summary: string;
 
   @IsEnum(BookReadingState)
-  readingState: BookReadingState = BookReadingState.UNREAD;
+  @IsOptional()
+  readingState: BookReadingState;
 
   @IsArray()
   @IsOptional()

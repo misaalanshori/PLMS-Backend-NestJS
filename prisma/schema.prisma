@@ -25,8 +25,8 @@ model Book {
   id           Int              @id @default(autoincrement())
   title        String
   author       String
-  description  String           @db.Text
-  summary      String           @db.Text
+  description  String?          @db.Text
+  summary      String?          @db.Text
   readingState BookReadingState @default(UNREAD)
   tags         BookTag[]
   createdAt    DateTime         @default(now())
