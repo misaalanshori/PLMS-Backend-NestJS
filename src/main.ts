@@ -1,12 +1,24 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { TransformInterceptor } from './interceptor/response.interceptor';
 import { HttpExceptionFilter } from './interceptor/http-exception.filter';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  ClassSerializerInterceptor,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // 0. Exclude Extraneous Values
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector), {
+      excludeExtraneousValues: true,
+    }),
+  );
+
   // 1. Global Interceptor (Formats Success)
   app.useGlobalInterceptors(new TransformInterceptor());
 

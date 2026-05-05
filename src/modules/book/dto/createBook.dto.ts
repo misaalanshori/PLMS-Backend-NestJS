@@ -1,12 +1,12 @@
-import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
-
-export enum BookReadingState {
-  UNREAD = 'UNREAD',
-  PLAN_TO_READ = 'PLAN_TO_READ',
-  READING = 'READING',
-  READ = 'READ',
-  DROPPED = 'DROPPED',
-}
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
+import { BookReadingState } from 'src/generated/prisma/enums';
 
 export class CreateBookDto {
   @IsString()
@@ -26,4 +26,10 @@ export class CreateBookDto {
 
   @IsEnum(BookReadingState)
   readingState: BookReadingState = BookReadingState.UNREAD;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  @MaxLength(191, { each: true })
+  tags: string[] = [];
 }
