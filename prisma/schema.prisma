@@ -29,6 +29,8 @@ model Book {
   summary      String?          @db.Text
   readingState BookReadingState @default(UNREAD)
   tags         BookTag[]
+  shelfId      Int?
+  shelf        Shelf?           @relation(fields: [shelfId], references: [id])
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 }
@@ -47,4 +49,13 @@ model Tag {
   name      String    @unique
   books     BookTag[]
   createdAt DateTime  @default(now())
+}
+
+model Shelf {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  books       Book[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
