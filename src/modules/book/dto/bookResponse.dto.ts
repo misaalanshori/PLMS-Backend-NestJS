@@ -1,5 +1,6 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 import { BookReadingState } from 'src/generated/prisma/enums';
+import { ShelfResponseDto } from 'src/modules/shelf/dto/shelfResponse.dto';
 import { TagResponseDto } from 'src/modules/tag/dto/tagResponse.dto';
 
 export class BookResponseDto {
@@ -30,6 +31,10 @@ export class BookResponseDto {
   @Expose()
   @Type(() => TagResponseDto)
   tags: TagResponseDto[];
+
+  @Expose()
+  @Type(() => ShelfResponseDto)
+  shelf: ShelfResponseDto | null;
 
   // Constructor to be able to instantiate the object
   constructor(partial: Partial<BookResponseDto>) {

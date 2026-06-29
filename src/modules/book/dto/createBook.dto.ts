@@ -2,6 +2,7 @@ import {
   IsArray,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   MaxLength,
@@ -35,4 +36,8 @@ export class CreateBookDto {
   @IsString({ each: true })
   @MaxLength(191, { each: true })
   tags: string[] = [];
+
+  @IsNumber()
+  @IsOptional()
+  shelfId: number | null;
 }

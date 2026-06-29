@@ -4,6 +4,7 @@ import { CreateBookDto } from './dto/createBook.dto';
 import { UpdateBookDto } from './dto/updateBook.dto';
 import { normalizeTag } from 'src/utils/normalizeTag.util';
 import { BookResponseDto } from './dto/bookResponse.dto';
+import { ShelfResponseDto } from '../shelf/dto/shelfResponse.dto';
 
 @Injectable()
 export class BookService {
@@ -11,27 +12,38 @@ export class BookService {
   async getBook(id: number): Promise<BookResponseDto | null> {
     const book = await this.prisma.book.findFirstOrThrow({
       where: { id },
-      include: { tags: { include: { tag: true } } },
+      include: {
+        tags: { include: { tag: true } },
+        shelf: { include: { books: true } },
+      },
     });
     return new BookResponseDto({
       ...book,
       tags: book.tags.map((tag) => tag.tag),
+      shelf: book.shelf && new ShelfResponseDto({ ...book.shelf }),
     });
   }
 
   async getAllBooks(): Promise<BookResponseDto[]> {
     const books = await this.prisma.book.findMany({
-      include: { tags: { include: { tag: true } } },
+      include: {
+        tags: { include: { tag: true } },
+        shelf: { include: { books: true } },
+      },
     });
 
     return books.map(
       (book) =>
-        new BookResponseDto({ ...book, tags: book.tags.map((tag) => tag.tag) }),
+        new BookResponseDto({
+          ...book,
+          tags: book.tags.map((tag) => tag.tag),
+          shelf: book.shelf && new ShelfResponseDto({ ...book.shelf }),
+        }),
     );
   }
 
   async createBook(dto: CreateBookDto): Promise<BookResponseDto | null> {
-    const { tags, ...bookData } = dto;
+    const { tags, shelfId, ...bookData } = dto;
     const normalizedTags = Array.from(new Set(tags.map(normalizeTag)));
     const book = await this.prisma.book.create({
       data: {
@@ -51,14 +63,17 @@ export class BookService {
             })),
           },
         }),
+        ...(shelfId ? { shelf: { connect: { id: shelfId } } } : null),
       },
       include: {
         tags: { include: { tag: true } },
+        shelf: { include: { books: true } },
       },
     });
     return new BookResponseDto({
       ...book,
       tags: book.tags.map((tag) => tag.tag),
+      shelf: book.shelf && new ShelfResponseDto({ ...book.shelf }),
     });
   }
 
@@ -66,7 +81,7 @@ export class BookService {
     dto: UpdateBookDto,
     id: number,
   ): Promise<BookResponseDto | null> {
-    const { tags, ...bookData } = dto;
+    const { tags, shelfId, ...bookData } = dto;
     const normalizedTags = Array.from(new Set(tags?.map(normalizeTag) || []));
     return await this.prisma.$transaction(async () => {
       const bookTags = await this.prisma.bookTag.findMany({
@@ -90,10 +105,15 @@ export class BookService {
                 })),
               },
             }),
+          ...('shelfId' in dto &&
+            (shelfId === null
+              ? { shelf: { disconnect: true } }
+              : { shelf: { connect: { id: shelfId } } })),
         },
         where: { id },
         include: {
           tags: { include: { tag: true } },
+          shelf: { include: { books: true } },
         },
       });
 
@@ -118,6 +138,7 @@ export class BookService {
       return new BookResponseDto({
         ...book,
         tags: book.tags.map((tag) => tag.tag),
+        shelf: book.shelf && new ShelfResponseDto({ ...book.shelf }),
       });
     });
   }
@@ -129,7 +150,10 @@ export class BookService {
       });
       const book = await this.prisma.book.delete({
         where: { id },
-        include: { tags: { include: { tag: true } } },
+        include: {
+          tags: { include: { tag: true } },
+          shelf: { include: { books: true } },
+        },
       });
 
       // Unused Tag deletion logic
@@ -149,6 +173,7 @@ export class BookService {
       return new BookResponseDto({
         ...book,
         tags: book.tags.map((tag) => tag.tag),
+        shelf: book.shelf && new ShelfResponseDto({ ...book.shelf }),
       });
     });
   }
