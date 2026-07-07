@@ -6,8 +6,11 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  ValidateNested,
 } from 'class-validator';
 import { BookReadingState } from 'src/generated/prisma/enums';
+import { BookImageDto } from './bookImage.dto';
+import { Type } from 'class-transformer';
 
 export class CreateBookDto {
   @IsString()
@@ -40,4 +43,10 @@ export class CreateBookDto {
   @IsNumber()
   @IsOptional()
   shelfId: number | null;
+
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => BookImageDto)
+  images: BookImageDto[] = [];
 }

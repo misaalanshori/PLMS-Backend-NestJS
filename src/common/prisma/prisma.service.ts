@@ -11,6 +11,6 @@ export class PrismaService extends PrismaClient {
       throw new Error('DATABASE_URL is not defined in environment variables');
     }
     const adapter = new PrismaMariaDb(connectionString);
-    super({ adapter });
+    super({ adapter, log: ['query', 'info', 'warn', 'error'] });
   }
 }

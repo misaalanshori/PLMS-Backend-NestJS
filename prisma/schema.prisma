@@ -22,17 +22,18 @@ enum BookReadingState {
 }
 
 model Book {
-  id           Int              @id @default(autoincrement())
-  title        String
-  author       String
-  description  String?          @db.Text
-  summary      String?          @db.Text
-  readingState BookReadingState @default(UNREAD)
-  tags         BookTag[]
-  shelfId      Int?
-  shelf        Shelf?           @relation(fields: [shelfId], references: [id])
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  id              Int              @id @default(autoincrement())
+  title           String
+  author          String
+  description     String?          @db.Text
+  summary         String?          @db.Text
+  readingState    BookReadingState @default(UNREAD)
+  tags            BookTag[]
+  shelfId         Int?
+  shelf           Shelf?           @relation(fields: [shelfId], references: [id])
+  bookMediaAssets BookMediaAsset[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 model BookTag {
@@ -58,4 +59,38 @@ model Shelf {
   books       Book[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+enum MediaAssetType {
+  IMAGE
+  VIDEO
+  RAW
+}
+
+enum MediaAssetStatus {
+  PENDING
+  ACTIVE
+}
+
+model MediaAsset {
+  id              Int              @id @default(autoincrement())
+  publicId        String           @unique
+  resourceType    MediaAssetType
+  format          String?
+  version         String?
+  uploadStatus    MediaAssetStatus @default(PENDING)
+  bookMediaAssets BookMediaAsset[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model BookMediaAsset {
+  bookId       Int
+  mediaAssetId Int
+  book         Book       @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  mediaAsset   MediaAsset @relation(fields: [mediaAssetId], references: [id])
+  order        Int
+
+  @@id([bookId, mediaAssetId])
+  @@unique([bookId, order])
 }

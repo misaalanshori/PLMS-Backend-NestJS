@@ -10,7 +10,9 @@ import {
 import { ValidationError } from 'class-validator';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    snapshot: true,
+  });
 
   // 0. Exclude Extraneous Values
   app.useGlobalInterceptors(
