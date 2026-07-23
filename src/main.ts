@@ -14,6 +14,8 @@ async function bootstrap() {
     snapshot: true,
   });
 
+  app.enableCors({ origin: process.env.FRONTEND_BASE_URL });
+
   // 0. Exclude Extraneous Values
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector), {
