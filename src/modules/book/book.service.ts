@@ -149,7 +149,7 @@ export class BookService {
       images && images.length > 0
         ? Object.fromEntries(images?.map((v) => [v.publicId, v.order]))
         : {};
-    console.log('AAAAAAAA', images);
+
     const validImages =
       images && images?.length > 0
         ? await this.mediaAssetService.fetchResourcesById(
@@ -161,7 +161,9 @@ export class BookService {
       const bookTags = await tx.bookTag.findMany({
         where: { bookId: id },
       });
-      await tx.bookTag.deleteMany({ where: { bookId: id } });
+      if (tags) {
+        await tx.bookTag.deleteMany({ where: { bookId: id } });
+      }
       if (images) {
         await tx.bookMediaAsset.deleteMany({ where: { bookId: id } });
         await this.mediaAssetService.updateResourceStatus(

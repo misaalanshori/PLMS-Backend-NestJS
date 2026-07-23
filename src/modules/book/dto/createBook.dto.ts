@@ -38,7 +38,7 @@ export class CreateBookDto {
   @IsOptional()
   @IsString({ each: true })
   @MaxLength(191, { each: true })
-  tags: string[] = [];
+  tags: string[];
 
   @IsNumber()
   @IsOptional()
@@ -48,5 +48,5 @@ export class CreateBookDto {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => BookImageDto)
-  images: BookImageDto[] = [];
+  images: BookImageDto[];
 }
