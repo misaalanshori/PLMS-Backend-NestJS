@@ -71,13 +71,14 @@ export class BookService {
 
   async createBook(dto: CreateBookDto): Promise<BookResponseDto | null> {
     const { tags, shelfId, images, ...bookData } = dto;
-    const normalizedTags = Array.from(new Set(tags.map(normalizeTag)));
-    const imagesMap = Object.fromEntries(
-      images.map((v) => [v.publicId, v.order]),
-    );
-    const validImages = await this.mediaAssetService.fetchResourcesById(
-      images.map((v) => v.publicId),
-    );
+    const normalizedTags = Array.from(new Set(tags?.map(normalizeTag) || []));
+    const imagesMap =
+      images && Object.fromEntries(images.map((v) => [v.publicId, v.order]));
+    const validImages =
+      images &&
+      (await this.mediaAssetService.fetchResourcesById(
+        images.map((v) => v.publicId),
+      ));
     const book = await this.prisma.$transaction(async (tx) => {
       await this.mediaAssetService.updateResourceStatus(
         validImages.map((v) => v.publicId),
@@ -102,18 +103,20 @@ export class BookService {
             },
           }),
           ...(shelfId ? { shelf: { connect: { id: shelfId } } } : null),
-          ...(validImages.length > 0 && {
-            bookMediaAssets: {
-              create: validImages.map((v) => ({
-                order: imagesMap[v.publicId],
-                mediaAsset: {
-                  connect: {
-                    publicId: v.publicId,
+          ...(validImages &&
+            imagesMap &&
+            validImages.length > 0 && {
+              bookMediaAssets: {
+                create: validImages.map((v) => ({
+                  order: imagesMap[v.publicId],
+                  mediaAsset: {
+                    connect: {
+                      publicId: v.publicId,
+                    },
                   },
-                },
-              })),
-            },
-          }),
+                })),
+              },
+            }),
         },
         include: {
           tags: { include: { tag: true } },
